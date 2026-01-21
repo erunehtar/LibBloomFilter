@@ -47,6 +47,9 @@ local floor, ceil, log, exp, random = math.floor, math.ceil, math.log, math.exp,
 local tostring, tonumber, strbyte = tostring, tonumber, strbyte
 local tinsert = table.insert
 
+-- Constants
+local DEFAULT_FALSE_POSITIVE_RATE = 0.01 -- Default: 1% FPR
+
 --- Hash a value using FNV-1a with different seeds.
 --- @param value any Value to hash.
 --- @param seed number Seed for hash variation.
@@ -105,7 +108,7 @@ LibBloomFilter.__index = LibBloomFilter
 --- @return LibBloomFilter instance The new Bloom Filter instance.
 function LibBloomFilter.New(capacity, falsePositiveRate)
     assert(capacity and capacity > 0, "capacity must be greater than 0")
-    falsePositiveRate = falsePositiveRate or 0.01
+    falsePositiveRate = falsePositiveRate or DEFAULT_FALSE_POSITIVE_RATE
     assert(falsePositiveRate > 0 and falsePositiveRate < 1, "falsePositiveRate must be between 0 and 1")
 
     -- Calculate optimal bit array size: m = -n*ln(p) / (ln(2)^2)
@@ -220,7 +223,7 @@ local function RunLibBloomFilterTests()
     print("=== LibBloomFilter Tests ===")
 
     -- Test 1: Basic insertion and membership
-    local bf = LibBloomFilter.New(100, 0.01)
+    local bf = LibBloomFilter.New(100)
     assert(not bf:Contains("item1"), "Test 1 Failed: Empty filter should not contain items")
 
     bf:Insert("item1")
@@ -232,7 +235,7 @@ local function RunLibBloomFilterTests()
     print("Test 1 PASSED: Basic insertion and membership")
 
     -- Test 2: False positives vs true negatives
-    local testBf = LibBloomFilter.New(100000, 0.01)
+    local testBf = LibBloomFilter.New(100000)
     for i = 1, 50000 do
         local item = "test_" .. i
         testBf:Insert(item)
@@ -253,7 +256,7 @@ local function RunLibBloomFilterTests()
     assert(actualFPR < 0.05, "Test 2 Failed: False positive rate too high")
 
     -- Test 3: Export and Import
-    local bf3 = LibBloomFilter.New(100, 0.01)
+    local bf3 = LibBloomFilter.New(100)
     for i = 1, 100 do
         bf3:Insert("export" .. i)
     end
@@ -267,7 +270,7 @@ local function RunLibBloomFilterTests()
     print("Test 3 PASSED: Export and Import")
 
     -- Test 4: Clear functionality
-    local bf4 = LibBloomFilter.New(100, 0.01)
+    local bf4 = LibBloomFilter.New(100)
     bf4:Insert("clear1")
     bf4:Insert("clear2")
     assert(bf4:Contains("clear1"), "Test 4 Failed: Should contain clear1 before clear")
@@ -278,7 +281,7 @@ local function RunLibBloomFilterTests()
     print("Test 4 PASSED: Clear functionality")
 
     -- Test 5: No false negatives (critical property)
-    local bf5 = LibBloomFilter.New(100000, 0.01)
+    local bf5 = LibBloomFilter.New(100000)
     local items = {}
     for i = 1, 100000 do
         items[i] = "item_" .. i
