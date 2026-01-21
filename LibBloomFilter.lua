@@ -34,7 +34,7 @@
 -- Compact bit array representation using 32-bit integers.
 -- Supports insertion, membership testing, clear, export/import, and false positive rate estimation.
 
-local MAJOR, MINOR = "LibBloomFilter", 2
+local MAJOR, MINOR = "LibBloomFilter", 3
 assert(LibStub, MAJOR .. " requires LibStub")
 
 local LibBloomFilter = LibStub:NewLibrary(MAJOR, MINOR)
