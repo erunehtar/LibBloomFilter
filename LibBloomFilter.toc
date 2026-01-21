@@ -1,0 +1,7 @@
+## Interface: 11508
+## Title: LibBloomFilter
+## Author: Erunehtar
+## Notes: Bloom Filter implementation for WoW Lua 5.1 environment.
+## Version: 1
+
+LibBloomFilter.lua
