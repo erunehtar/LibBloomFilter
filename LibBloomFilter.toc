@@ -1,4 +1,4 @@
-## Interface: 11508
+## Interface: 11508, 20505, 30405, 40402, 50503, 110207
 ## Title: LibBloomFilter
 ## Author: Erunehtar
 ## Notes: Bloom Filter implementation for WoW Lua 5.1 environment.
