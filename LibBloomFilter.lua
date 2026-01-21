@@ -78,7 +78,7 @@ local function GetBit(self, bitIndex)
     return band(self.bits[intIndex], lshift(1, bitOffset)) ~= 0
 end
 
---- @class LibBloomFilter LibBloomFilter data structure.
+--- @class LibBloomFilter Bloom Filter data structure.
 --- @field New fun(capacity: number, falsePositiveRate?: number): LibBloomFilter
 --- @field Insert fun(self: LibBloomFilter, value: any)
 --- @field Contains fun(self: LibBloomFilter, value: any): boolean
