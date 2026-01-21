@@ -96,11 +96,12 @@ local newFilter = LibBloomFilter.Import(state)
 
 ## API
 
-### LibBloomFilter.New(capacity, falsePositiveRate)
+### LibBloomFilter.New(capacity, seed, falsePositiveRate)
 
 Create a new Bloom Filter instance.
 
 - `capacity` (number): Capacity of the filter (expected number of values).
+- `seed` (number, optional): Seed for hash functions (default: 0).
 - `falsePositiveRate` (number, optional): Desired false positive rate (between 0 and 1, default: 0.01 which means 1%).
 - Returns: LibBloomFilter - The new Bloom Filter instance.
 
