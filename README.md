@@ -14,7 +14,7 @@ Bloom Filter for WoW Lua 5.1 environment - Probabilistic set membership testing 
 
 Measured on an AMD Ryzen 9 5900X with 10,000 samples using random strings of length 12.
 
-The fastest result is shown in **bold**.
+Smaller time is better. The fastest result is shown in **bold**.
 
 | New | Median | Average | Min | Max | Total |
 | - | - | - | - | - | - |
@@ -45,6 +45,18 @@ The fastest result is shown in **bold**.
 | **LibBloomFilter** | 0.90us | 0.88us | 0.70us | 3.60us | 8.84ms |
 | LibPatternedBloomFilter | 406.20us | 448.20us | 319.10us | 2.87ms | 4482.02ms |
 | LibCuckooFilter | 334.10us | 336.10us | 324.70us | 712.90us | 3361.02ms |
+
+## Export Size Comparison
+
+Measured by exporting the filter state after inserting 10,000 values, then serializing with LibSerialize and compressing with LibDeflate.
+
+Smaller is better. The smallest result is shown in **bold**.
+
+| Export Size | Serialized (Per Value) | Compressed (Per Value) |
+| - | - | - |
+| LibBloomFilter | 14.63KB (~1.50B) | 13.12KB (~1.35B) |
+| **LibPatternedBloomFilter** | 14.43KB (~1.48B) | 12.34KB (~1.26B) |
+| LibCuckooFilter | 35.88KB (~3.67B) | 30.09KB (~3.08B) |
 
 ## Installation
 
