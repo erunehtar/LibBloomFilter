@@ -195,8 +195,8 @@ function LibBloomFilter.Import(state)
     }, LibBloomFilter)
 end
 
---- Get estimated false positive rate based on current load
---- @return number Estimated false positive rate
+--- Estimate the current false positive rate of the bloom filter.
+--- @return number Estimated false positive rate.
 function LibBloomFilter:GetFalsePositiveRate()
     local k = self.numHashes
     local m = self.numBits

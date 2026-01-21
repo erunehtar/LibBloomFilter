@@ -69,10 +69,6 @@ Determine if a value is possibly in the Bloom Filter.
 - `value`: The value to check (any).
 - Returns: `true` if the value is possibly in the set, `false` if definitely not.
 
-### filter:Clear()
-
-Clear all values from the Bloom Filter.
-
 ### filter:Export()
 
 Export the current state of the Bloom Filter.
@@ -85,6 +81,16 @@ Import the Bloom Filter state from a compact representation.
 
 - `state`: A compact representation of the Bloom Filter state.
 - Returns: A new Bloom Filter instance.
+
+### filter:Clear()
+
+Clear all values from the Bloom Filter.
+
+### filter:GetFalsePositiveRate()
+
+Estimate the current false positive rate of the patterned bloom filter.
+
+- Returns: Estimated false positive rate (number).
 
 ## License
 
