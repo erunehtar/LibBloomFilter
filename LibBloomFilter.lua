@@ -79,19 +79,19 @@ local function GetBit(self, bitIndex)
 end
 
 --- @class LibBloomFilter LibBloomFilter data structure.
---- @field New fun(numItems: number, falsePositiveRate?: number): LibBloomFilter
+--- @field New fun(capacity: number, falsePositiveRate?: number): LibBloomFilter
 --- @field Insert fun(self: LibBloomFilter, value: any)
 --- @field Contains fun(self: LibBloomFilter, value: any): boolean
 --- @field Clear fun(self: LibBloomFilter)
 --- @field Export fun(self: LibBloomFilter): LibBloomFilterState
 --- @field Import fun(state: LibBloomFilterState): LibBloomFilter
---- @field GetFalsePositiveRate fun(self: LibBloomFilter): number
+--- @field EstimateFalsePositiveRate fun(self: LibBloomFilter): number
 --- @field numBits number Total number of bits in the filter.
 --- @field numHashes number Number of hash functions.
 --- @field bits [number] Bit array represented as array of 32-bit integers.
 --- @field itemCount number Number of items inserted.
 
---- @class LibBloomFilterState Compact representation of Bloom Filter.
+--- @class LibBloomFilterState Compact representation of a Bloom Filter state.
 --- @field [1] number Total number of bits in the filter.
 --- @field [2] number Number of hash functions.
 --- @field [3] number Number of items inserted.
@@ -100,8 +100,8 @@ end
 LibBloomFilter.__index = LibBloomFilter
 
 --- Create a new Bloom Filter instance.
---- @param capacity number Capacity of the Bloom Filter (expected number of values).
---- @param falsePositiveRate number Desired false positive rate (default: 0.01 which means 1%).
+--- @param capacity number Capacity of the filter (expected number of values).
+--- @param falsePositiveRate number Desired false positive rate (between 0 and 1, default: 0.01 which means 1%).
 --- @return LibBloomFilter instance The new Bloom Filter instance.
 function LibBloomFilter.New(capacity, falsePositiveRate)
     assert(capacity and capacity > 0, "capacity must be greater than 0")
@@ -130,7 +130,7 @@ function LibBloomFilter.New(capacity, falsePositiveRate)
     }, LibBloomFilter)
 end
 
---- Insert a value into the Bloom Filter.
+--- Insert a value into filter.
 --- @param value any Value to insert.
 function LibBloomFilter:Insert(value)
     assert(value ~= nil, "value cannot be nil")
@@ -142,7 +142,7 @@ function LibBloomFilter:Insert(value)
     self.itemCount = self.itemCount + 1
 end
 
---- Determine if a value is possibly in the Bloom Filter.
+--- Determine if a value is possibly in the filter.
 --- @param value any Value to check.
 --- @return boolean contains True if value might be in the set, false if definitely not.
 function LibBloomFilter:Contains(value)
@@ -158,7 +158,7 @@ function LibBloomFilter:Contains(value)
     return true
 end
 
---- Clear all values from the Bloom Filter.
+--- Clear all values from the filter.
 function LibBloomFilter:Clear()
     local numInts = ceil(self.numBits / 32)
     for i = 1, numInts do
@@ -167,8 +167,8 @@ function LibBloomFilter:Clear()
     self.itemCount = 0
 end
 
---- Export the current state of the Bloom Filter.
---- @return LibBloomFilterState state Compact representation of the Bloom Filter.
+--- Export the current state of the filter.
+--- @return LibBloomFilterState state Compact representation of the filter.
 function LibBloomFilter:Export()
     return {
         self.numBits,
@@ -179,7 +179,7 @@ function LibBloomFilter:Export()
 end
 
 --- Import a new Bloom Filter from a compact representation.
---- @param state LibBloomFilterState Compact representation of the Bloom Filter.
+--- @param state LibBloomFilterState Compact representation of the filter.
 --- @return LibBloomFilter instance The imported Bloom Filter instance.
 function LibBloomFilter.Import(state)
     assert(state and type(state) == "table", "state must be a table")
@@ -195,14 +195,18 @@ function LibBloomFilter.Import(state)
     }, LibBloomFilter)
 end
 
---- Estimate the current false positive rate of the bloom filter.
---- @return number Estimated false positive rate.
-function LibBloomFilter:GetFalsePositiveRate()
+--- Estimate the current false positive rate (FPR) of the filter based on current load factor.
+--- @return number fpr Estimated false positive rate.
+function LibBloomFilter:EstimateFalsePositiveRate()
+    -- FPR ≈ (1-e^(-kn/m))^k
+    -- Where:
+    --   k = number of hash functions
+    --   m = number of bits in the filter
+    --   n = number of inserted items
+    --   e = Euler's number (approx. 2.71828)
     local k = self.numHashes
     local m = self.numBits
     local n = self.itemCount
-
-    -- FP rate = (1 - e^(-kn/m))^k
     return (1 - exp(-(k * n) / m)) ^ k
 end
 
@@ -244,7 +248,7 @@ local function RunLibBloomFilterTests()
     end
 
     local actualFPR = falsePositives / testCount
-    local estimatedFPR = testBf:GetFalsePositiveRate()
+    local estimatedFPR = testBf:EstimateFalsePositiveRate()
     print(string.format("Test 2 PASSED: FP Rate - Actual: %.4f, Estimated: %.4f", actualFPR, estimatedFPR))
     assert(actualFPR < 0.05, "Test 2 Failed: False positive rate too high")
 
